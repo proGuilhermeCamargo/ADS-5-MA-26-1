@@ -1,7 +1,3 @@
-# Aula 1 - Tela de Login Simples
-
-Este é um projeto [Expo](https://expo.dev) desenvolvido com React Native para criar uma tela de login simples.
-
 ## 📋 Pré-requisitos
 
 Antes de começar, certifique-se de ter instalado:
