@@ -1,8 +1,20 @@
 import { useState } from 'react'
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 export const Home = () => {
     const [valorText, setValorText] = useState("")
+    const [list, setList] = useState<string[]>([])
+
+    console.log("Comprimento do texto", valorText.length)
+
+    const adicionaNaLista = () => {
+        if(valorText.length == 0){
+            alert("Campo de texto está vazio")
+            return
+        }
+        setList([...list, valorText])
+        setValorText("")
+    }
 
     return (
         <View style={estilo.container}>
@@ -12,9 +24,31 @@ export const Home = () => {
                 value={valorText}
             />
 
-            <Text>{valorText}</Text>
+            <ScrollView>
+                {
+                    list.map((item) => {
+                        return (
+                            <View>
+                                <Text>{item}</Text>
+                            </View>
+                        )
+                    })
+                }
+            </ScrollView>
+
+
+            {/* <FlatList
+              data={list}  
+              renderItem={({item}) => {
+                return (
+                    <View>
+                        <Text>{item}</Text>
+                    </View>
+                )
+              }}
+            /> */}
             
-            <TouchableOpacity style={estilo.styleButton}>
+            <TouchableOpacity onPress={adicionaNaLista} style={estilo.styleButton}>
                 <Text style={estilo.styleTextButton}>Adicionar</Text>
             </TouchableOpacity>
         </View>
