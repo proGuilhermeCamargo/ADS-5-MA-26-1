@@ -135,17 +135,12 @@ import axios from "axios";
 
 export default function App() {
     const [value, setValue] = useState("")
-    const [loading, setLoading] = useState(true)
 
     const requestApi = async () => {
-        setTimeout(() => {
-            axios.get("http://localhost:3000/teste").then((resp) => {
-                console.log("RESPOSTA DA API", resp.data)
-                setValue(resp.data)
-            }).finally(() => {
-                setLoading(false)
-            })
-        }, 3000)
+         axios.get("http://localhost:3000/teste").then((resposta) => {
+             console.log("RESPOSTA DA API", resposta.data)
+             setValue(resposta.data)
+         })
     }
 
     useEffect(() => {
