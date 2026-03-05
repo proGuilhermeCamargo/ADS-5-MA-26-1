@@ -130,7 +130,7 @@ O código implementado faz uma requisição GET para a API e exibe o resultado:
 
 ```typescript
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import axios from "axios";
 
 export default function App() {
@@ -149,12 +149,7 @@ export default function App() {
 
     return(
         <View style={estilo.container}>
-            {
-                loading ? 
-                <ActivityIndicator size={50}/> 
-                    : 
-                <Text>{value}</Text>
-            }
+            <Text>{value}</Text>
         </View>
     )
 }
