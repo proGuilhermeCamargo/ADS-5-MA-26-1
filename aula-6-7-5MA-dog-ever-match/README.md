@@ -21,7 +21,7 @@ Este repositório é o resultado do que construímos juntos em sala nas aulas 6 
   - Separarmos o que é estrutura/lógica (`home.tsx`) do que é visual (`styles.ts`), para deixar o código limpo e fácil de manter.
   - Usamos componentes básicos do React Native (views, textos, botões, etc.) para montar a interface.
 
-- **Consumindo uma API externa (API de cachorros / “dog”)**
+- **Consumindo uma API externa (API de cachorros / “dogs”)**
   - Relembramos o que é uma **requisição HTTP** em apps mobile.
   - Utilizamos uma API externa (como a de imagens de cachorros) para trazer dados reais para o app.
   - Conversamos sobre o fluxo de dados: buscar na API, guardar no estado, mostrar na tela e tratar situações de erro.
