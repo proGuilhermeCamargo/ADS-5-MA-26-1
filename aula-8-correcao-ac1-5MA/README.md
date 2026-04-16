@@ -99,18 +99,109 @@ Em síntese, em relação ao estado “só aula 6/7” clonado:
 
 ---
 
-## 6. Como rodar
+## 6. Como rodar os dois projetos (passo a passo)
 
-1. **API** (pasta `api-dog-ever-match`): instalar dependências, configurar `.env` se necessário e subir o servidor na porta usada pelo app (ex.: 3000).
+Este repositório tem **dois projetos separados** que precisam rodar **ao mesmo tempo** em terminais diferentes:
 
-2. **Mobile** (pasta `mobile`):
+1. **API** (backend Node.js) — pasta `api-dog-ever-match`
+2. **Mobile** (app Expo) — pasta `mobile`
 
-   ```bash
-   npm install
-   npx expo start
-   ```
+A API precisa estar **ligada primeiro**, porque o app chama `http://.../dogs/getAllDogs` ao abrir a tela inicial. Se a API não estiver no ar, a lista de cães não carrega.
 
-Garanta que o endereço da API no código (`axios.get(...)`) corresponda ao host acessível pelo emulador ou pelo dispositivo.
+### 6.1. O que instalar no computador (antes de tudo)
+
+- **Node.js** (versão LTS recomendada), que já traz o **npm**.  
+  - Verifique no terminal: `node -v` e `npm -v` (deve aparecer um número de versão em cada um).
+- **Git** (se ainda for clonar o repositório).
+- Para testar no **celular físico**: instale o app **Expo Go** (Android ou iOS) pela loja de aplicativos.
+- Para **emulador Android**: Android Studio; para **simulador iOS** (só em Mac): Xcode.
+
+Se algum comando abaixo falhar com “comando não encontrado”, o Node provavelmente não está instalado ou não está no PATH.
+
+### 6.2. Abrir o terminal na pasta certa
+
+1. No explorador de arquivos (Finder no Mac, Explorer no Windows), entre na pasta raiz do projeto (onde existem as pastas `api-dog-ever-match` e `mobile`).
+2. Abra um terminal **nessa pasta** (no VS Code/Cursor: menu *Terminal → New Terminal* costuma já abrir na raiz do projeto).
+
+Daqui em diante, os caminhos assumem que você está na **raiz** do repositório (a pasta que contém `api-dog-ever-match` e `mobile`).
+
+### 6.3. Projeto 1 — API (Terminal 1)
+
+Abra **um** terminal e execute **na ordem**:
+
+```bash
+cd api-dog-ever-match
+npm install
+npm start
+```
+
+- **`cd api-dog-ever-match`** — entra na pasta da API.
+- **`npm install`** — baixa as dependências listadas no `package.json` (só precisa rodar de novo se mudar dependências ou apagar `node_modules`).
+- **`npm start`** — sobe o servidor com **nodemon** na **porta 3000** (definida em `server.js`).
+
+**Sinal de que deu certo:** no terminal deve aparecer algo como `Server is running on port 3000`. **Deixe esse terminal aberto**; fechar interrompe a API.
+
+**Teste rápido no navegador:** abra `http://localhost:3000/dogs/getAllDogs`  
+Se aparecer JSON (lista de cães ou `[]`), a API está respondendo.
+
+**Se der erro ao instalar (especialmente `sqlite3`):** às vezes é necessário ferramentas de compilação no sistema. Em Mac costuma instalar Xcode Command Line Tools; em Windows, as “build tools” do Visual Studio. Peça ajuda ao professor se a mensagem de erro citar `node-gyp` ou `sqlite3`.
+
+### 6.4. Projeto 2 — Mobile (Terminal 2)
+
+Abra **outro** terminal (novo), deixando o da API **rodando**, e execute:
+
+```bash
+cd mobile
+npm install
+npx expo start
+```
+
+- **`cd mobile`** — entra na pasta do app Expo.
+- **`npm install`** — dependências do React Native / Expo (pode demorar na primeira vez).
+- **`npx expo start`** — inicia o **Metro Bundler** e mostra um **QR Code** no terminal e, em geral, uma página no navegador.
+
+**Sinal de que deu certo:** o terminal mostra o QR Code e opções como pressionar `a` (Android), `i` (iOS), `w` (web).
+
+**Como abrir o app:**
+
+| Onde você testa | O que fazer |
+|-----------------|-------------|
+| **Celular com Expo Go** | Celular e PC na **mesma rede Wi‑Fi**. Escaneie o QR Code com a câmera (iOS) ou com o app Expo Go (Android). |
+| **Emulador Android** | Com o emulador aberto, no terminal do Expo pressione **`a`**. |
+| **Simulador iOS (Mac)** | Pressione **`i`** (requer Xcode). |
+| **Navegador (web)** | Pressione **`w`** — útil para ver layout, mas alguns comportamentos são diferentes do celular. |
+
+Na primeira vez, o Expo pode pedir para criar conta ou usar offline; siga as opções na tela ou use o modo tunnel se a rede bloquear conexão entre celular e PC.
+
+### 6.5. `localhost` no celular e em emuladores (importante)
+
+No código da home, a URL está assim:
+
+`http://localhost:3000/dogs/getAllDogs`
+
+- **`localhost`** no app significa “o próprio aparelho onde o app roda”, **não** o seu computador.
+- Por isso:
+  - **No computador (Expo web `w`)** — `localhost:3000` costuma funcionar se a API está na mesma máquina.
+  - **No emulador Android** — use o IP especial do host: troque no código para `http://10.0.2.2:3000/dogs/getAllDogs` (é o jeito padrão do emulador Android falar com o `localhost` do PC).
+  - **No celular físico na mesma rede** — descubra o IP do seu PC na rede Wi‑Fi (ex.: `192.168.0.15`) e use `http://192.168.0.15:3000/dogs/getAllDogs` no código (o número muda de rede para rede).
+  - **No simulador iOS** — muitas vezes `localhost` funciona para falar com o servidor no Mac; se não funcionar, use o IP da máquina como no celular.
+
+**Como achar o IP no Mac:** *Preferências do Sistema → Rede → Wi‑Fi → Detalhes → TCP/IP* (IPv4).  
+**No Windows:** `ipconfig` no CMD/PowerShell e procure “IPv4” da rede Wi‑Fi/Ethernet.
+
+Depois de alterar a URL no arquivo `mobile/src/screens/home/home.tsx`, salve o arquivo; o Expo costuma recarregar sozinho (**Fast Refresh**).
+
+### 6.6. Ordem e resumo
+
+1. Terminal 1: `cd api-dog-ever-match` → `npm install` → `npm start` → esperar mensagem na porta **3000**.
+2. Terminal 2: `cd mobile` → `npm install` → `npx expo start` → abrir no dispositivo/emulador conforme a tabela acima.
+3. Ajustar a URL da API no mobile se não estiver usando web nem `localhost` compatível com seu ambiente.
+
+### 6.7. Problemas comuns
+
+- **“Cannot connect” / lista vazia / erro de rede no app** — API não está rodando, porta errada ou URL com `localhost` onde deveria ser IP ou `10.0.2.2`.
+- **“Port 3000 already in use”** — outro programa usa a porta; feche o outro processo ou altere a porta na API (e no `axios` do mobile) com orientação do professor.
+- **`npm install` muito lento ou erros** — tente de novo com internet estável; em redes da faculdade, proxy pode atrapalhar.
 
 ---
 
