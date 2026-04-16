@@ -1,120 +1,125 @@
-## Projeto da Aula 6 e 7 – Desenvolvimento Mobile com React Native e Expo
+# Aula 8 — Dog Ever Match (mobile)
 
-Este repositório é o resultado do que construímos juntos em sala nas aulas 6 e 7, explorando desenvolvimento mobile com **React Native**, **Expo** e **expo-router**. A ideia é que você use este projeto como um “guia de estudo”: para lembrar o que foi feito, entender como as coisas se encaixam e ter um ponto de partida para experimentar por conta própria.
-
----
-
-## O que foi trabalhado em aula
-
-- **Começando o projeto com Expo**
-  - Vimos como criar um projeto usando a CLI do Expo.
-  - Conversamos sobre a estrutura básica que o `expo-router` cria (pasta `app`, telas, navegação).
-  - Entendemos na prática a diferença entre rodar no emulador e no celular usando o app Expo Go.
-
-- **Navegação com expo-router e React Navigation**
-  - Configuramos a navegação em pilha (Stack) usando o arquivo de layout principal.
-  - Falamos sobre rotas baseadas em arquivos: cada arquivo dentro de `app` vira uma tela ou um agrupador de telas.
-  - Ajustamos opções de tela, como esconder o cabeçalho padrão para ficar mais com a nossa cara.
-
-- **Telas e estilos organizados**
-  - Criamos uma tela de **Home** em `src/screens/home`.
-  - Separarmos o que é estrutura/lógica (`home.tsx`) do que é visual (`styles.ts`), para deixar o código limpo e fácil de manter.
-  - Usamos componentes básicos do React Native (views, textos, botões, etc.) para montar a interface.
-
-- **Consumindo uma API externa (API de cachorros / “dogs”)**
-  - Relembramos o que é uma **requisição HTTP** em apps mobile.
-  - Utilizamos uma API externa (como a de imagens de cachorros) para trazer dados reais para o app.
-  - Conversamos sobre o fluxo de dados: buscar na API, guardar no estado, mostrar na tela e tratar situações de erro.
-
-- **Tema e aparência do app**
-  - Vimos o uso de temas (`DefaultTheme`, `DarkTheme`) e do `ThemeProvider` do React Navigation.
-  - Entendemos como o tema influencia as cores e o visual geral de navegação do app.
+Esta aula parte do projeto **Dog Ever Match** (stack Expo + API Node) e consolida o que foi acrescentado **após o clone** da base das aulas anteriores: **navegação entre telas**, **passagem de parâmetros**, **Redux (Redux Toolkit)** e **consumo de API** com Axios.
 
 ---
 
-## Bibliotecas e ferramentas principais utilizadas
+## Objetivos da aula 8
 
-- **Expo**
-  - É o “kit de ferramentas” que facilita a nossa vida no React Native.
-  - Cuida da parte nativa, build, testes em dispositivos e ainda traz vários módulos prontos (câmera, sensores, etc.).
-
-- **React Native**
-  - É a base de tudo: a biblioteca que permite criar apps nativos usando JavaScript/TypeScript.
-  - Com ela montamos a interface com componentes declarativos que funcionam em iOS e Android.
-
-- **expo-router**
-  - Sistema de rotas baseado em arquivos.
-  - Em vez de ficar registrando rota em vários lugares, ele lê a pasta `app` e monta a navegação para você.
-
-- **@react-navigation/native**
-  - Biblioteca de navegação que trabalha junto com o `expo-router`.
-  - Permite criar navegação em pilha, abas, drawer, e controlar headers, temas e muito mais.
-
-- **react-native-reanimated**
-  - Biblioteca para animações avançadas e performáticas.
-  - Mesmo que não tenhamos ido a fundo nela ainda, ela é importante para a stack moderna de navegação.
+- Configurar **Expo Router** com **Stack** para mais de uma rota (`index` e `details`).
+- Navegar programaticamente com **`router.push`** e enviar dados na **URL (search params)**.
+- Na tela de destino, ler parâmetros com **`useLocalSearchParams`** e tratar objetos com **`JSON.stringify` / `JSON.parse`**.
+- Integrar **Redux** na raiz do app com **`Provider`** e um **store** criado com **Redux Toolkit** (`configureStore`, `createSlice`).
+- Manter a listagem de cães vinda da **API** com **Axios** e estado local (`useState` + `useEffect`).
 
 ---
 
-## Conceitos de desenvolvimento mobile reforçados
+## 1. Navegação com Expo Router
 
-- **Componentização**
-  - Em vez de um arquivo gigante, quebrar a interface em pedaços reaproveitáveis.
-  - Separar bem o que é lógica, o que é visual e o que são estilos, facilitando manutenção e evolução do projeto.
+No Expo Router, as rotas vêm da pasta **`app/`**:
 
-- **Estado e ciclo de vida**
-  - Usar estado para guardar os dados vindos da API e decidir o que aparece na tela.
-  - Entender em que momento buscar dados (por exemplo, quando a tela é carregada) e como reagir quando algo muda.
+| Arquivo        | Rota      | Uso |
+|----------------|-----------|-----|
+| `app/index.tsx`   | `/`       | Tela inicial (home), que renderiza o componente `Home`. |
+| `app/details.tsx` | `/details` | Tela de detalhes, que renderiza o componente `Details`. |
 
-- **Responsividade e experiência do usuário**
-  - Pensar em layouts que ficam bons em telas diferentes, sem quebrar no primeiro celular mais “diferentão”.
-  - Dar feedback para o usuário: mostrar que está carregando, tratar erros e não deixar tudo vazio sem explicação.
+O **layout raiz** (`app/_layout.tsx`) define um **`Stack`** do Expo Router e registra as telas:
 
----
+- `index` — sem cabeçalho (`headerShown: false`).
+- `details` — com cabeçalho padrão (`headerShown: true`).
 
-## Como estudar a partir deste projeto
+Assim, a pilha de navegação fica explícita e cada arquivo em `app/` corresponde a um segmento da URL.
 
-- **Dar uma olhada nas telas e estilos**
-  - Abra os arquivos de tela (como a Home) e tente identificar:
-    - Quais componentes do React Native estão sendo usados.
-    - Onde o estado é criado e atualizado.
-    - Como os estilos estão organizados e aplicados.
-
-- **Seguir o fluxo de navegação**
-  - Veja como a navegação foi configurada nos arquivos de layout.
-  - Entenda qual é a primeira tela que o app abre e como ele muda de uma tela para outra.
-
-- **Observar o consumo de API**
-  - Descubra onde a requisição HTTP é feita.
-  - Veja como a resposta da API vira informação na tela.
+**Orientação:** em projetos Expo Router, prefira manter **uma pasta `app/`** só para rotas e layouts, e mover telas reais para algo como `src/screens/`, importando-as nos arquivos de rota (como em `index.tsx` e `details.tsx`). Isso separa **roteamento** de **UI e lógica**.
 
 ---
 
-## Documentações recomendadas para aprofundar
+## 2. Passagem de parâmetros (prioridade)
 
-- **Documentação oficial do React Native**  
-  - Para entender bem os componentes, APIs nativas e boas práticas.
+Os **search params** do Expo Router são **strings**. Para enviar um **objeto** (por exemplo, o cão atual da lista), o fluxo usado no projeto é:
 
-- **Documentação do Expo**  
-  - Para aprender a criar projetos, rodar no celular, usar módulos prontos e gerar builds.
+1. Na origem (`Home`), ao tocar na imagem, usar **`router.push`** com **`pathname`** e **`params`**:
 
-- **Documentação do expo-router**  
-  - Para dominar rotas baseadas em arquivos, layouts aninhados e navegação mais avançada.
+   - `params: { data: JSON.stringify(valueApi[0]) }`
 
-- **Documentação do React Navigation (@react-navigation/native)**  
-  - Para explorar melhor Stack, Tabs, Drawer, headers personalizados, temas, parâmetros de rota, etc.
+2. No destino (`Details`), usar **`useLocalSearchParams`** para obter `data` e fazer **`JSON.parse(data as string)`** para reconstruir o objeto.
 
-- **Documentação da API utilizada (ex.: API de cachorros)**  
-  - Para ver quais endpoints existem, como são as respostas e como você pode ir além do que fizemos em aula.
+**Por que serializar?** Parâmetros de rota não transportam objetos JavaScript diretamente; serializar em JSON garante que a navegação funcione de forma previsível.
+
+**Cuidados:**
+
+- Tratar o caso em que `data` ainda não existe ou a string é inválida (em produção, use validação ou estado de carregamento).
+- Objetos muito grandes podem ser problemáticos em URLs; para dados pesados, prefira **identificador na URL** + **busca na API** ou **estado global (Redux)**.
 
 ---
 
-## Próximos passos sugeridos para você
+## 3. Redux (Redux Toolkit) — prioridade
 
-- Criar **novas telas** reaproveitando a estrutura que usamos em aula.
-- Brincar com o layout e os estilos da Home para deixar o app com a sua identidade visual.
-- Consumir **outro endpoint** da mesma API ou até testar uma API diferente.
-- Melhorar os feedbacks visuais de carregamento e erro, deixando o app mais “profissional”.
-- Ir abrindo as documentações indicadas enquanto mexe no projeto, para ligar teoria e prática.
+O app envolve a árvore de componentes com **`Provider`** do `react-redux`, apontando para o **`store`** definido em `src/store/store.ts`.
 
-Este README é um resumo do que rolou em aula e um ponto de partida para você continuar estudando. Volte aqui sempre que precisar relembrar os conceitos e use o projeto para experimentar sem medo.
+- **`configureStore`** registra o reducer `counter` (nome do slice).
+- O slice em `src/store/slices/counter-slice.ts` expõe, entre outros, a action **`dataDogs`** para guardar um payload em **`state.data`** — útil como **alternativa** à passagem só por parâmetros quando o dado precisa ser **global** ou **reutilizado** em várias telas.
+
+Na tela de detalhes, o exemplo com **`useSelector`** para ler `state.counter.data` pode ficar **comentado** a favor dos **params** da rota; na prática, você escolhe:
+
+- **Params** — bom para “abrir esta tela já com este objeto”.
+- **Redux** — bom para estado compartilhado, cache ou fluxos que não dependem da URL.
+
+**Dependências:** `@reduxjs/toolkit` e `react-redux` (já referenciadas no `package.json` do mobile).
+
+---
+
+## 4. Chamadas de API (Axios)
+
+A home busca os cães com **GET** em:
+
+`http://localhost:3000/dogs/getAllDogs`
+
+(Endpoint exposto pela API em `api-dog-ever-match`, rota `getAllDogs`.)
+
+- O resultado é guardado em estado com **`useState`**.
+- A requisição roda no **`useEffect`** na montagem do componente.
+
+**Nota:** em **dispositivo físico** ou emulador, `localhost` aponta para o próprio aparelho. Use o IP da máquina na rede (por exemplo `http://192.168.x.x:3000/...`) ou ferramentas como o ngrok, conforme o ambiente.
+
+---
+
+## 5. O que mudou em relação à base (após o clone)
+
+Em síntese, em relação ao estado “só aula 6/7” clonado:
+
+| Área | Alteração |
+|------|-----------|
+| **Layout** | `Provider` do Redux em volta do `Stack`; import do `store`. |
+| **Home** | Navegação com **`router.push`** + **`params`** com JSON do item atual (em vez de só `navigate('/details')` sem dados). |
+| **Details** | UI completa: foto, nome, descrição, idade, contato, endereço, gênero, tamanho; leitura de params com **`useLocalSearchParams`**. |
+| **Estilos** | Arquivo dedicado `src/screens/details/styles.ts` para a tela de detalhes. |
+| **Redux** | Pasta `src/store/` com `store.ts` e `slices/counter-slice.ts`. |
+| **Dependências** | Redux Toolkit e React Redux no projeto mobile. |
+
+---
+
+## 6. Como rodar
+
+1. **API** (pasta `api-dog-ever-match`): instalar dependências, configurar `.env` se necessário e subir o servidor na porta usada pelo app (ex.: 3000).
+
+2. **Mobile** (pasta `mobile`):
+
+   ```bash
+   npm install
+   npx expo start
+   ```
+
+Garanta que o endereço da API no código (`axios.get(...)`) corresponda ao host acessível pelo emulador ou pelo dispositivo.
+
+---
+
+## Referências rápidas
+
+- [Expo Router — navegação](https://docs.expo.dev/router/introduction/)
+- [Expo Router — parâmetros de rota](https://docs.expo.dev/router/reference/url-parameters/)
+- [Redux Toolkit — `configureStore` e `createSlice`](https://redux-toolkit.js.org/introduction/getting-started)
+
+---
+
+*Disciplina / contexto: ADS — foco em navegação Expo, parâmetros, Redux e integração com API REST.*
